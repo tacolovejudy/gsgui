@@ -1,5 +1,1 @@
-# Ghostscript GUI 依賴套件
-# Tkinter 通常內建於 Python，無需額外安裝
-
-# 打包工具 (選用)
-pyinstaller>=5.0
+# No additional packages required - uses Python standard library only

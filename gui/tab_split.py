@@ -51,9 +51,28 @@ class SplitTab(BaseTab):
             command=self._toggle_mode
         ).pack(anchor=tk.W)
 
-        # 頁碼範圍列表容器
-        self.ranges_container = ttk.Frame(mode1_frame)
-        self.ranges_container.pack(fill=tk.BOTH, expand=True, padx=20, pady=5)
+        # 頁碼範圍列表容器（含捲軸）
+        scroll_frame = ttk.Frame(mode1_frame)
+        scroll_frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=5)
+
+        # Canvas 和 Scrollbar
+        self.ranges_canvas = tk.Canvas(scroll_frame, height=150, highlightthickness=0)
+        scrollbar = ttk.Scrollbar(scroll_frame, orient=tk.VERTICAL, command=self.ranges_canvas.yview)
+        self.ranges_container = ttk.Frame(self.ranges_canvas)
+
+        self.ranges_canvas.configure(yscrollcommand=scrollbar.set)
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        self.ranges_canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+
+        # 將容器放入 Canvas
+        self.canvas_window = self.ranges_canvas.create_window((0, 0), window=self.ranges_container, anchor=tk.NW)
+
+        # 綁定事件以更新捲動區域
+        self.ranges_container.bind("<Configure>", self._on_ranges_configure)
+        self.ranges_canvas.bind("<Configure>", self._on_canvas_configure)
+
+        # 滑鼠滾輪支援
+        self.ranges_canvas.bind_all("<MouseWheel>", self._on_mousewheel)
 
         # 新增範圍按鈕
         add_btn_frame = ttk.Frame(mode1_frame)
@@ -174,6 +193,18 @@ class SplitTab(BaseTab):
         # 更新刪除按鈕顯示狀態
         self._update_delete_buttons()
         self._toggle_mode()
+
+    def _on_ranges_configure(self, event):
+        """更新捲動區域"""
+        self.ranges_canvas.configure(scrollregion=self.ranges_canvas.bbox("all"))
+
+    def _on_canvas_configure(self, event):
+        """調整內部框架寬度"""
+        self.ranges_canvas.itemconfig(self.canvas_window, width=event.width)
+
+    def _on_mousewheel(self, event):
+        """滑鼠滾輪捲動"""
+        self.ranges_canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
 
     def _remove_range(self, frame):
         """移除一個頁碼範圍"""

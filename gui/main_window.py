@@ -20,8 +20,8 @@ class MainWindow:
     def __init__(self):
         self.root = tk.Tk()
         self.root.title("Ghostscript GUI")
-        self.root.geometry("600x500")
-        self.root.minsize(500, 400)
+        self.root.geometry("600x800")
+        self.root.minsize(500, 600)
 
         self._setup_style()
         self._create_widgets()
@@ -29,9 +29,20 @@ class MainWindow:
     def _setup_style(self):
         """設定樣式"""
         style = ttk.Style()
-        style.configure("TNotebook.Tab", padding=[12, 6])
-        style.configure("TButton", padding=[10, 5])
+
+        # 設定預設字體大小
+        default_font = ("Microsoft JhengHei", 11)
+        style.configure(".", font=default_font)
+        style.configure("TNotebook.Tab", padding=[12, 6], font=default_font)
+        style.configure("TButton", padding=[10, 5], font=default_font)
+        style.configure("TLabel", font=default_font)
+        style.configure("TRadiobutton", font=default_font)
+        style.configure("TCheckbutton", font=default_font)
         style.configure("TLabelframe", padding=10)
+        style.configure("TLabelframe.Label", font=("Microsoft JhengHei", 11, "bold"))
+
+        # 設定預設字體給標準 Tk 元件
+        self.root.option_add("*Font", default_font)
 
     def _create_widgets(self):
         """建立元件"""

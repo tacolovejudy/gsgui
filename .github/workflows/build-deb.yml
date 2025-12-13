@@ -1,0 +1,94 @@
+name: Build Linux DEB
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:  # 允許手動觸發
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ghostscript python3-tk
+          pip install pyinstaller
+
+      - name: Build with PyInstaller
+        run: |
+          pyinstaller --onefile --windowed \
+            --name gsgui \
+            --add-data "gui:gui" \
+            --add-data "core:core" \
+            main.py
+
+      - name: Create DEB package
+        run: |
+          # 建立 DEB 目錄結構
+          mkdir -p deb_package/DEBIAN
+          mkdir -p deb_package/usr/bin
+          mkdir -p deb_package/usr/share/applications
+          mkdir -p deb_package/usr/share/icons/hicolor/128x128/apps
+
+          # 複製執行檔
+          cp dist/gsgui deb_package/usr/bin/
+          chmod +x deb_package/usr/bin/gsgui
+
+          # 取得版本號
+          VERSION="${GITHUB_REF_NAME:-1.0.0}"
+          VERSION="${VERSION#v}"
+
+          # 建立控制檔
+          cat > deb_package/DEBIAN/control << EOF
+          Package: gsgui
+          Version: ${VERSION}
+          Section: utils
+          Priority: optional
+          Architecture: amd64
+          Depends: ghostscript, python3-tk
+          Maintainer: Your Name <your.email@example.com>
+          Description: Ghostscript GUI
+           A graphical user interface for Ghostscript PDF operations.
+           Features include PDF resizing, conversion to images, merging,
+           splitting, and compression.
+          EOF
+
+          # 建立桌面捷徑
+          cat > deb_package/usr/share/applications/gsgui.desktop << EOF
+          [Desktop Entry]
+          Name=Ghostscript GUI
+          Comment=PDF processing with Ghostscript
+          Exec=/usr/bin/gsgui
+          Icon=gsgui
+          Terminal=false
+          Type=Application
+          Categories=Utility;Office;
+          EOF
+
+          # 建立 DEB 包
+          dpkg-deb --build deb_package gsgui_${VERSION}_amd64.deb
+
+      - name: Upload DEB artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: gsgui-deb
+          path: "*.deb"
+
+      - name: Upload to Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: "*.deb"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
