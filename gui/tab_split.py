@@ -71,8 +71,14 @@ class SplitTab(BaseTab):
         self.ranges_container.bind("<Configure>", self._on_ranges_configure)
         self.ranges_canvas.bind("<Configure>", self._on_canvas_configure)
 
-        # 滑鼠滾輪支援
-        self.ranges_canvas.bind_all("<MouseWheel>", self._on_mousewheel)
+        # 滑鼠滾輪支援（跨平台）
+        import sys
+        if sys.platform == "win32":
+            self.ranges_canvas.bind_all("<MouseWheel>", self._on_mousewheel)
+        else:
+            # Linux/macOS
+            self.ranges_canvas.bind_all("<Button-4>", self._on_mousewheel_linux)
+            self.ranges_canvas.bind_all("<Button-5>", self._on_mousewheel_linux)
 
         # 新增範圍按鈕
         add_btn_frame = ttk.Frame(mode1_frame)
@@ -203,8 +209,15 @@ class SplitTab(BaseTab):
         self.ranges_canvas.itemconfig(self.canvas_window, width=event.width)
 
     def _on_mousewheel(self, event):
-        """滑鼠滾輪捲動"""
+        """滑鼠滾輪捲動 (Windows)"""
         self.ranges_canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
+
+    def _on_mousewheel_linux(self, event):
+        """滑鼠滾輪捲動 (Linux/macOS)"""
+        if event.num == 4:
+            self.ranges_canvas.yview_scroll(-1, "units")
+        elif event.num == 5:
+            self.ranges_canvas.yview_scroll(1, "units")
 
     def _remove_range(self, frame):
         """移除一個頁碼範圍"""

@@ -28,10 +28,20 @@ class MainWindow:
 
     def _setup_style(self):
         """設定樣式"""
+        import sys
         style = ttk.Style()
 
-        # 設定預設字體大小
-        default_font = ("Microsoft JhengHei", 11)
+        # 跨平台字體設定
+        if sys.platform == "win32":
+            font_family = "Microsoft JhengHei"
+        elif sys.platform == "darwin":
+            font_family = "PingFang TC"
+        else:
+            font_family = "Noto Sans CJK TC"  # Linux
+
+        default_font = (font_family, 11)
+        bold_font = (font_family, 11, "bold")
+
         style.configure(".", font=default_font)
         style.configure("TNotebook.Tab", padding=[12, 6], font=default_font)
         style.configure("TButton", padding=[10, 5], font=default_font)
@@ -39,7 +49,7 @@ class MainWindow:
         style.configure("TRadiobutton", font=default_font)
         style.configure("TCheckbutton", font=default_font)
         style.configure("TLabelframe", padding=10)
-        style.configure("TLabelframe.Label", font=("Microsoft JhengHei", 11, "bold"))
+        style.configure("TLabelframe.Label", font=bold_font)
 
         # 設定預設字體給標準 Tk 元件
         self.root.option_add("*Font", default_font)
