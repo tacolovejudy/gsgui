@@ -320,6 +320,7 @@ class GhostscriptWrapper:
             "-dNOPAUSE",
             "-sDEVICE=pdfwrite",
             "-dCompatibilityLevel=1.4",
+            "-dPDFFitPage",
             f"-dPDFSETTINGS=/{pdf_settings}",
             f"-sOutputFile={output_file}",
             input_file,
