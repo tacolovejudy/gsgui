@@ -20,8 +20,8 @@ class MainWindow:
     def __init__(self):
         self.root = tk.Tk()
         self.root.title("Ghostscript GUI")
-        self.root.geometry("600x800")
-        self.root.minsize(500, 600)
+        self.root.geometry("600x700")
+        self.root.minsize(500, 500)
 
         self._setup_style()
         self._create_widgets()
