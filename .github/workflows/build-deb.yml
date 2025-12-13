@@ -31,6 +31,17 @@ jobs:
             --name gsgui \
             --add-data "gui:gui" \
             --add-data "core:core" \
+            --hidden-import=gui \
+            --hidden-import=gui.main_window \
+            --hidden-import=gui.base_tab \
+            --hidden-import=gui.tab_resize \
+            --hidden-import=gui.tab_to_image \
+            --hidden-import=gui.tab_merge \
+            --hidden-import=gui.tab_split \
+            --hidden-import=gui.tab_compress \
+            --hidden-import=core \
+            --hidden-import=core.ghostscript \
+            --hidden-import=core.config \
             main.py
 
       - name: Create DEB package

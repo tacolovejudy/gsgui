@@ -15,8 +15,15 @@ Ghostscript GUI
 import sys
 import os
 
-# 確保可以找到模組
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+# 處理 PyInstaller 打包後的路徑
+if getattr(sys, 'frozen', False):
+    # 打包後的執行檔
+    base_path = sys._MEIPASS
+else:
+    # 直接執行 Python 腳本
+    base_path = os.path.dirname(os.path.abspath(__file__))
+
+sys.path.insert(0, base_path)
 
 from gui import MainWindow
 
