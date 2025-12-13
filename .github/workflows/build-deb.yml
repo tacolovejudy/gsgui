@@ -45,9 +45,12 @@ jobs:
           cp dist/gsgui deb_package/usr/bin/
           chmod +x deb_package/usr/bin/gsgui
 
-          # 取得版本號
-          VERSION="${GITHUB_REF_NAME:-1.0.0}"
-          VERSION="${VERSION#v}"
+          # 取得版本號（tag 觸發用 tag 名，否則用 1.0.0）
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            VERSION="${GITHUB_REF_NAME#v}"
+          else
+            VERSION="1.0.0"
+          fi
 
           # 建立控制檔
           cat > deb_package/DEBIAN/control << EOF
