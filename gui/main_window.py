@@ -12,6 +12,7 @@ from .tab_to_image import ToImageTab
 from .tab_merge import MergeTab
 from .tab_split import SplitTab
 from .tab_compress import CompressTab
+from .tab_images_to_pdf import ImagesToPdfTab
 
 
 class MainWindow:
@@ -79,6 +80,9 @@ class MainWindow:
 
         self.compress_tab = CompressTab(self.notebook)
         self.notebook.add(self.compress_tab.frame, text="壓縮 PDF")
+
+        self.images_to_pdf_tab = ImagesToPdfTab(self.notebook)
+        self.notebook.add(self.images_to_pdf_tab.frame, text="圖片轉 PDF")
 
     def run(self):
         """執行主視窗"""
