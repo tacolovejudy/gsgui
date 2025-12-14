@@ -9,6 +9,7 @@ from tkinter import ttk
 
 from .tab_resize import ResizeTab
 from .tab_to_image import ToImageTab
+from .tab_image_to_pdf import ImageToPdfTab
 from .tab_merge import MergeTab
 from .tab_split import SplitTab
 from .tab_compress import CompressTab
@@ -69,7 +70,10 @@ class MainWindow:
         self.notebook.add(self.resize_tab.frame, text="頁面調整")
 
         self.to_image_tab = ToImageTab(self.notebook)
-        self.notebook.add(self.to_image_tab.frame, text="轉換圖片")
+        self.notebook.add(self.to_image_tab.frame, text="PDF 轉圖片")
+
+        self.image_to_pdf_tab = ImageToPdfTab(self.notebook)
+        self.notebook.add(self.image_to_pdf_tab.frame, text="圖片轉 PDF")
 
         self.merge_tab = MergeTab(self.notebook)
         self.notebook.add(self.merge_tab.frame, text="合併 PDF")

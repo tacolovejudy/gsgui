@@ -1,1 +1,2 @@
-# No additional packages required - uses Python standard library only
+# Image processing for image to PDF conversion
+Pillow>=10.0.0

@@ -7,6 +7,7 @@ Ghostscript GUI
 功能:
 - PDF 頁面大小調整
 - PDF 轉換為圖片
+- 圖片轉換為 PDF (支援批次分組)
 - PDF 合併
 - PDF 分割
 - PDF 壓縮
