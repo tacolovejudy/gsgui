@@ -49,51 +49,46 @@ jobs:
 
       - name: Create DEB package
         run: |
-          # 建立 DEB 目錄結構
           mkdir -p deb_package/DEBIAN
           mkdir -p deb_package/usr/bin
           mkdir -p deb_package/usr/share/applications
           mkdir -p deb_package/usr/share/icons/hicolor/128x128/apps
 
-          # 複製執行檔
           cp dist/gsgui deb_package/usr/bin/
           chmod +x deb_package/usr/bin/gsgui
 
-          # 取得版本號（tag 觸發用 tag 名，否則用 1.0.0）
           if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
             VERSION="${GITHUB_REF_NAME#v}"
           else
             VERSION="1.0.0"
           fi
 
-          # 建立控制檔
-          cat > deb_package/DEBIAN/control << EOF
-Package: gsgui
-Version: ${VERSION}
-Section: utils
-Priority: optional
-Architecture: amd64
-Depends: ghostscript, python3-tk
-Maintainer: Your Name <your.email@example.com>
-Description: Ghostscript GUI
- A graphical user interface for Ghostscript PDF operations.
- Features include PDF resizing, conversion to images, merging,
- splitting, compression, and images to PDF conversion.
-EOF
+          cat > deb_package/DEBIAN/control << 'CTRL'
+          Package: gsgui
+          Version: ${VERSION}
+          Section: utils
+          Priority: optional
+          Architecture: amd64
+          Depends: ghostscript, python3-tk
+          Maintainer: Your Name <your.email@example.com>
+          Description: Ghostscript GUI
+           A graphical user interface for Ghostscript PDF operations.
+          CTRL
+          sed -i 's/^          //' deb_package/DEBIAN/control
+          sed -i "s/\${VERSION}/$VERSION/" deb_package/DEBIAN/control
 
-          # 建立桌面捷徑
-          cat > deb_package/usr/share/applications/gsgui.desktop << EOF
-[Desktop Entry]
-Name=Ghostscript GUI
-Comment=PDF processing with Ghostscript
-Exec=/usr/bin/gsgui
-Icon=gsgui
-Terminal=false
-Type=Application
-Categories=Utility;Office;
-EOF
+          cat > deb_package/usr/share/applications/gsgui.desktop << 'DESKTOP'
+          [Desktop Entry]
+          Name=Ghostscript GUI
+          Comment=PDF processing with Ghostscript
+          Exec=/usr/bin/gsgui
+          Icon=gsgui
+          Terminal=false
+          Type=Application
+          Categories=Utility;Office;
+          DESKTOP
+          sed -i 's/^          //' deb_package/usr/share/applications/gsgui.desktop
 
-          # 建立 DEB 包
           dpkg-deb --build deb_package gsgui_${VERSION}_amd64.deb
 
       - name: Upload DEB artifact
