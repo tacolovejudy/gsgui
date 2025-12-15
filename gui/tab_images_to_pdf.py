@@ -50,6 +50,15 @@ class ImagesToPdfTab(BaseTab):
         ttk.Button(btn_frame, text="上移", command=self._move_up).pack(side=tk.LEFT, padx=2)
         ttk.Button(btn_frame, text="下移", command=self._move_down).pack(side=tk.LEFT, padx=2)
 
+        # 分批設定
+        batch_frame = ttk.Frame(self.frame)
+        batch_frame.pack(fill=tk.X, pady=5)
+
+        ttk.Label(batch_frame, text="每份 PDF 圖片數 (0=全部合併):").pack(side=tk.LEFT)
+        self.batch_size_var = tk.StringVar(value="0")
+        batch_entry = ttk.Entry(batch_frame, textvariable=self.batch_size_var, width=10)
+        batch_entry.pack(side=tk.LEFT, padx=5)
+
         # 輸出檔案
         self.output_var = tk.StringVar()
         self.create_file_output(self.frame, "輸出 PDF", self.output_var)
@@ -132,12 +141,35 @@ class ImagesToPdfTab(BaseTab):
         if not self.validate_output_file(output_file):
             return
 
+        # 取得分批大小
+        try:
+            batch_size = int(self.batch_size_var.get())
+            if batch_size < 0:
+                batch_size = 0
+        except ValueError:
+            batch_size = 0
+
         def task():
             try:
-                # 使用 img2pdf 將圖片轉換為 PDF
-                with open(output_file, "wb") as f:
-                    f.write(img2pdf.convert(files))
-                return True, f"成功將 {len(files)} 個圖片合併為 PDF"
+                if batch_size == 0 or batch_size >= len(files):
+                    # 全部合併為一個 PDF
+                    with open(output_file, "wb") as f:
+                        f.write(img2pdf.convert(files))
+                    return True, f"成功將 {len(files)} 個圖片合併為 PDF"
+                else:
+                    # 分批轉換
+                    base_name = os.path.splitext(output_file)[0]
+                    ext = os.path.splitext(output_file)[1] or ".pdf"
+
+                    pdf_count = 0
+                    for i in range(0, len(files), batch_size):
+                        batch_files = files[i:i + batch_size]
+                        pdf_count += 1
+                        batch_output = f"{base_name}_{pdf_count:03d}{ext}"
+                        with open(batch_output, "wb") as f:
+                            f.write(img2pdf.convert(batch_files))
+
+                    return True, f"成功將 {len(files)} 個圖片分成 {pdf_count} 個 PDF"
             except Exception as e:
                 return False, f"轉換失敗: {str(e)}"
 
