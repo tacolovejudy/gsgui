@@ -24,6 +24,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y ghostscript python3-tk
           pip install pyinstaller
+          pip install -r requirements.txt
 
       - name: Build with PyInstaller
         run: |
@@ -39,9 +40,11 @@ jobs:
             --hidden-import=gui.tab_merge \
             --hidden-import=gui.tab_split \
             --hidden-import=gui.tab_compress \
+            --hidden-import=gui.tab_images_to_pdf \
             --hidden-import=core \
             --hidden-import=core.ghostscript \
             --hidden-import=core.config \
+            --hidden-import=img2pdf \
             main.py
 
       - name: Create DEB package
@@ -65,30 +68,30 @@ jobs:
 
           # 建立控制檔
           cat > deb_package/DEBIAN/control << EOF
-          Package: gsgui
-          Version: ${VERSION}
-          Section: utils
-          Priority: optional
-          Architecture: amd64
-          Depends: ghostscript, python3-tk
-          Maintainer: Your Name <your.email@example.com>
-          Description: Ghostscript GUI
-           A graphical user interface for Ghostscript PDF operations.
-           Features include PDF resizing, conversion to images, merging,
-           splitting, and compression.
-          EOF
+Package: gsgui
+Version: ${VERSION}
+Section: utils
+Priority: optional
+Architecture: amd64
+Depends: ghostscript, python3-tk
+Maintainer: Your Name <your.email@example.com>
+Description: Ghostscript GUI
+ A graphical user interface for Ghostscript PDF operations.
+ Features include PDF resizing, conversion to images, merging,
+ splitting, compression, and images to PDF conversion.
+EOF
 
           # 建立桌面捷徑
           cat > deb_package/usr/share/applications/gsgui.desktop << EOF
-          [Desktop Entry]
-          Name=Ghostscript GUI
-          Comment=PDF processing with Ghostscript
-          Exec=/usr/bin/gsgui
-          Icon=gsgui
-          Terminal=false
-          Type=Application
-          Categories=Utility;Office;
-          EOF
+[Desktop Entry]
+Name=Ghostscript GUI
+Comment=PDF processing with Ghostscript
+Exec=/usr/bin/gsgui
+Icon=gsgui
+Terminal=false
+Type=Application
+Categories=Utility;Office;
+EOF
 
           # 建立 DEB 包
           dpkg-deb --build deb_package gsgui_${VERSION}_amd64.deb
