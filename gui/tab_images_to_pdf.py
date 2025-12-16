@@ -68,6 +68,9 @@ class ImagesToPdfTab(BaseTab):
 
     def _add_files(self):
         """新增圖片檔案"""
+        # 記錄新增前列表是否為空
+        was_empty = self.file_listbox.size() == 0
+
         filenames = filedialog.askopenfilenames(
             filetypes=[
                 ("圖片檔案", "*.png *.jpg *.jpeg *.bmp *.gif *.tiff *.tif"),
@@ -79,8 +82,8 @@ class ImagesToPdfTab(BaseTab):
         for f in filenames:
             self.file_listbox.insert(tk.END, f)
 
-        # 自動產生輸出檔名
-        if self.file_listbox.size() > 0 and not self.output_var.get():
+        # 若之前列表為空，自動產生輸出檔名
+        if was_empty and self.file_listbox.size() > 0:
             first_file = self.file_listbox.get(0)
             dirname = os.path.dirname(first_file)
             basename = os.path.splitext(os.path.basename(first_file))[0]
