@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout code
@@ -45,11 +45,7 @@ jobs:
             --hidden-import=core.ghostscript \
             --hidden-import=core.config \
             --hidden-import=img2pdf \
-            --exclude-module libstdc++ \
             main.py
-
-          # 移除 bundled 的 libstdc++，使用系統版本以避免 GLIBCXX 版本衝突
-          find dist -name "libstdc++*" -delete 2>/dev/null || true
 
       - name: Create DEB package
         run: |
