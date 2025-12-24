@@ -330,14 +330,17 @@ class GhostscriptWrapper:
 
     def get_pdf_page_count(self, input_file: str) -> int:
         """取得 PDF 頁數"""
+        # 將路徑轉換為 PostScript 格式（處理反斜線和特殊字元）
+        ps_path = input_file.replace("\\", "/")
+
+        # 注意：_run_command_fast 會自動加 -q，所以這裡不需要再加
         args = [
-            "-q",
             "-dNODISPLAY",
             "-dNOSAFER",
             "-c",
-            f"({input_file}) (r) file runpdfbegin pdfpagecount = quit"
+            f"({ps_path}) (r) file runpdfbegin pdfpagecount = quit"
         ]
-        success, output = self._run_command(args)
+        success, output = self._run_command_fast(args)
         if success:
             try:
                 return int(output.strip())
